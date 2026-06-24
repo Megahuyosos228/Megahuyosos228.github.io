@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Нажми на кнопку</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>НАЖМИ НА КНОПКУ</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -55,85 +55,139 @@
 <div class="container">
     <h1>⚡НАЖМИ НА КНОПКУ⚡</h1>
     <a href="#" class="btn" id="goBtn">🚀 ПЕРЕЙТИ</a>
-    <div class="small-note">звук включится автоматически</div>
+    <div class="small-note">громкий звук АХИ</div>
 </div>
 
 <script>
-    function playMoan() {
+    function playStrongMoan() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
 
-            // Основной голос
+            // ========== ОСНОВНОЙ СТОН (ГРОМКИЙ) ==========
             const osc1 = ctx.createOscillator();
             osc1.type = 'sawtooth';
-            osc1.frequency.setValueAtTime(280, now);
-            osc1.frequency.linearRampToValueAtTime(450, now + 0.4);
-            osc1.frequency.linearRampToValueAtTime(380, now + 0.8);
+            osc1.frequency.setValueAtTime(180, now);
+            osc1.frequency.linearRampToValueAtTime(320, now + 0.1);
+            osc1.frequency.linearRampToValueAtTime(480, now + 0.3);
+            osc1.frequency.linearRampToValueAtTime(520, now + 0.5);
+            osc1.frequency.linearRampToValueAtTime(400, now + 0.9);
+            osc1.frequency.linearRampToValueAtTime(280, now + 1.3);
 
             const osc2 = ctx.createOscillator();
             osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(320, now);
-            osc2.frequency.linearRampToValueAtTime(520, now + 0.5);
-            osc2.frequency.linearRampToValueAtTime(410, now + 0.9);
+            osc2.frequency.setValueAtTime(210, now);
+            osc2.frequency.linearRampToValueAtTime(390, now + 0.2);
+            osc2.frequency.linearRampToValueAtTime(560, now + 0.4);
+            osc2.frequency.linearRampToValueAtTime(610, now + 0.6);
+            osc2.frequency.linearRampToValueAtTime(450, now + 1.0);
+            osc2.frequency.linearRampToValueAtTime(310, now + 1.5);
 
+            // ГРОМКОСТЬ (реалистичная огибающая)
             const gain = ctx.createGain();
-            gain.gain.setValueAtTime(0.01, now);
-            gain.gain.linearRampToValueAtTime(0.9, now + 0.15);
-            gain.gain.linearRampToValueAtTime(0.4, now + 0.5);
-            gain.gain.linearRampToValueAtTime(0.01, now + 1.4);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.95, now + 0.08);
+            gain.gain.setValueAtTime(0.95, now + 0.3);
+            gain.gain.linearRampToValueAtTime(0.6, now + 0.6);
+            gain.gain.linearRampToValueAtTime(0.3, now + 1.0);
+            gain.gain.linearRampToValueAtTime(0.001, now + 1.8);
 
+            // ВИБРАТО (дрожь голоса)
             const vibrato = ctx.createOscillator();
-            vibrato.frequency.value = 35;
+            vibrato.frequency.value = 38;
             const vGain = ctx.createGain();
-            vGain.gain.value = 18;
+            vGain.gain.value = 28;
             vibrato.connect(vGain);
             vGain.connect(osc1.frequency);
 
+            // ЭФФЕКТ "ЭХО" (дополнительный короткий звук)
+            const gainEcho = ctx.createGain();
+            gainEcho.gain.setValueAtTime(0.001, now);
+            gainEcho.gain.linearRampToValueAtTime(0.35, now + 0.5);
+            gainEcho.gain.linearRampToValueAtTime(0.001, now + 0.9);
+
+            const oscEcho = ctx.createOscillator();
+            oscEcho.type = 'sine';
+            oscEcho.frequency.setValueAtTime(400, now + 0.4);
+            oscEcho.frequency.linearRampToValueAtTime(250, now + 1.0);
+
+            // Собираем цепочку
             osc1.connect(gain);
             osc2.connect(gain);
+            oscEcho.connect(gainEcho);
             gain.connect(ctx.destination);
+            gainEcho.connect(ctx.destination);
 
+            // Запуск
             osc1.start(now);
             osc2.start(now);
-            osc1.stop(now + 1.5);
-            osc2.stop(now + 1.5);
+            oscEcho.start(now + 0.4);
+            osc1.stop(now + 1.9);
+            osc2.stop(now + 1.9);
+            oscEcho.stop(now + 1.2);
             vibrato.start(now);
-            vibrato.stop(now + 1.5);
+            vibrato.stop(now + 1.9);
 
-            // Второй звук через паузу
+            // ========== ВТОРОЙ АХ (короткий, через 0.8 сек) ==========
             setTimeout(() => {
                 const now2 = ctx.currentTime;
                 const osc3 = ctx.createOscillator();
-                osc3.type = 'sine';
-                osc3.frequency.setValueAtTime(350, now2);
-                osc3.frequency.linearRampToValueAtTime(480, now2 + 0.3);
+                osc3.type = 'sawtooth';
+                osc3.frequency.setValueAtTime(220, now2);
+                osc3.frequency.linearRampToValueAtTime(380, now2 + 0.15);
+                osc3.frequency.linearRampToValueAtTime(500, now2 + 0.35);
+                osc3.frequency.linearRampToValueAtTime(310, now2 + 0.7);
+
                 const gain2 = ctx.createGain();
-                gain2.gain.setValueAtTime(0.01, now2);
-                gain2.gain.linearRampToValueAtTime(0.5, now2 + 0.1);
-                gain2.gain.linearRampToValueAtTime(0.01, now2 + 0.6);
+                gain2.gain.setValueAtTime(0.001, now2);
+                gain2.gain.linearRampToValueAtTime(0.8, now2 + 0.05);
+                gain2.gain.linearRampToValueAtTime(0.5, now2 + 0.3);
+                gain2.gain.linearRampToValueAtTime(0.001, now2 + 0.9);
+
                 osc3.connect(gain2);
                 gain2.connect(ctx.destination);
                 osc3.start(now2);
-                osc3.stop(now2 + 0.7);
-            }, 500);
+                osc3.stop(now2 + 0.9);
+
+                // ТРЕТИЙ АХ (ещё более высокий, через 0.4 сек после второго)
+                setTimeout(() => {
+                    const now3 = ctx.currentTime;
+                    const osc4 = ctx.createOscillator();
+                    osc4.type = 'sine';
+                    osc4.frequency.setValueAtTime(300, now3);
+                    osc4.frequency.linearRampToValueAtTime(550, now3 + 0.2);
+                    osc4.frequency.linearRampToValueAtTime(360, now3 + 0.5);
+
+                    const gain3 = ctx.createGain();
+                    gain3.gain.setValueAtTime(0.001, now3);
+                    gain3.gain.linearRampToValueAtTime(0.6, now3 + 0.05);
+                    gain3.gain.linearRampToValueAtTime(0.001, now3 + 0.6);
+
+                    osc4.connect(gain3);
+                    gain3.connect(ctx.destination);
+                    osc4.start(now3);
+                    osc4.stop(now3 + 0.6);
+                }, 400);
+            }, 700);
 
         } catch (e) {
             alert('⚠️ Звук не воспроизвёлся. Нажми ещё раз или разреши звук в браузере.');
         }
     }
 
+    // ========== КНОПКА ==========
     document.getElementById('goBtn').addEventListener('click', function(e) {
         e.preventDefault();
-        playMoan();
+        playStrongMoan();
         setTimeout(() => {
-            // СЮДА ВСТАВЬ ССЫЛКУ
+            // ССЫЛКА ДЛЯ ПЕРЕХОДА (ЗАМЕНИ НА СВОЮ)
             window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-        }, 200);
+        }, 300);
     });
 
+    // РАЗРЕШАЕМ АУДИО НА МОБИЛЬНЫХ
     document.addEventListener('click', function() {
         if (window.AudioContext) {
             const ctx = new AudioContext();
@@ -141,8 +195,7 @@
         }
     }, { once: true });
 
-    console.log('⚡ SWILL SITE READY ⚡');
+    console.log('⚡ SWILL SITE READY (Strong Moan) ⚡');
 </script>
-
 </body>
 </html>
