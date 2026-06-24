@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нажми на кнопку</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0b0b0b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        .container {
+            background: #1c1c1e;
+            padding: 60px 40px;
+            border-radius: 48px;
+            box-shadow: 0 20px 60px rgba(255, 0, 100, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff0066, #ff3399);
+            color: #fff;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 24px 48px;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(255, 0, 100, 0.5);
+            transition: 0.2s;
+            text-decoration: none;
+            width: 100%;
+            letter-spacing: 2px;
+        }
+        .btn:active { transform: scale(0.92); background: #cc0044; }
+        .small-note { color: #555; margin-top: 30px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚡НАЖМИ НА КНОПКУ⚡</h1>
+    <a href="#" class="btn" id="goBtn">🚀 ПЕРЕЙТИ</a>
+    <div class="small-note">звук включится автоматически</div>
+</div>
+
+<script>
+    function playMoan() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+
+            // Основной голос
+            const osc1 = ctx.createOscillator();
+            osc1.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(280, now);
+            osc1.frequency.linearRampToValueAtTime(450, now + 0.4);
+            osc1.frequency.linearRampToValueAtTime(380, now + 0.8);
+
+            const osc2 = ctx.createOscillator();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(320, now);
+            osc2.frequency.linearRampToValueAtTime(520, now + 0.5);
+            osc2.frequency.linearRampToValueAtTime(410, now + 0.9);
+
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.01, now);
+            gain.gain.linearRampToValueAtTime(0.9, now + 0.15);
+            gain.gain.linearRampToValueAtTime(0.4, now + 0.5);
+            gain.gain.linearRampToValueAtTime(0.01, now + 1.4);
+
+            const vibrato = ctx.createOscillator();
+            vibrato.frequency.value = 35;
+            const vGain = ctx.createGain();
+            vGain.gain.value = 18;
+            vibrato.connect(vGain);
+            vGain.connect(osc1.frequency);
+
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + 1.5);
+            osc2.stop(now + 1.5);
+            vibrato.start(now);
+            vibrato.stop(now + 1.5);
+
+            // Второй звук через паузу
+            setTimeout(() => {
+                const now2 = ctx.currentTime;
+                const osc3 = ctx.createOscillator();
+                osc3.type = 'sine';
+                osc3.frequency.setValueAtTime(350, now2);
+                osc3.frequency.linearRampToValueAtTime(480, now2 + 0.3);
+                const gain2 = ctx.createGain();
+                gain2.gain.setValueAtTime(0.01, now2);
+                gain2.gain.linearRampToValueAtTime(0.5, now2 + 0.1);
+                gain2.gain.linearRampToValueAtTime(0.01, now2 + 0.6);
+                osc3.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc3.start(now2);
+                osc3.stop(now2 + 0.7);
+            }, 500);
+
+        } catch (e) {
+            alert('⚠️ Звук не воспроизвёлся. Нажми ещё раз или разреши звук в браузере.');
+        }
+    }
+
+    document.getElementById('goBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        playMoan();
+        setTimeout(() => {
+            // СЮДА ВСТАВЬ ССЫЛКУ
+            window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        }, 200);
+    });
+
+    document.addEventListener('click', function() {
+        if (window.AudioContext) {
+            const ctx = new AudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+        }
+    }, { once: true });
+
+    console.log('⚡ SWILL SITE READY ⚡');
+</script>
+
+</body>
+</html>
