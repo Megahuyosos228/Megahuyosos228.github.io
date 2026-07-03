@@ -1,475 +1,101 @@
-i<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hardcore Dummies · Bogdan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт Bogdan</title>
     <style>
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            user-select: none;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
         body {
-            margin: 0;
             min-height: 100vh;
-            background: #0c0c1a;
+            background: linear-gradient(145deg, #0b0b1a, #1a1a2e);
             display: flex;
             justify-content: center;
             align-items: center;
-            touch-action: none;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
         }
-        .app {
+        .card {
+            background: #1f1f3a;
+            padding: 48px 32px;
+            border-radius: 48px;
             max-width: 440px;
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(145deg, #14142a, #1a1a32);
-            border-radius: 48px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.04);
+            text-align: center;
+            border: 1px solid #3a3a66;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
-        .hud {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 6px 14px 6px;
-            color: #c8d0e0;
-            font-weight: 600;
-            font-size: 14px;
-            letter-spacing: 0.3px;
+        .card h1 {
+            font-size: 36px;
+            margin: 0 0 16px 0;
+            background: linear-gradient(90deg, #f7c948, #e94560);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .hud-left, .hud-right { display: flex; align-items: center; gap: 12px; }
-        .hp-block {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #1f1f3a;
-            padding: 4px 14px 4px 10px;
-            border-radius: 30px;
-            border: 1px solid #2f2f52;
-        }
-        .hp-bar-bg {
-            width: 90px;
-            height: 8px;
-            background: #2a2a48;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        .hp-bar-fill {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
-            border-radius: 20px;
-            transition: width 0.12s ease;
-        }
-        .coin-block {
-            background: #1f1f3a;
-            padding: 4px 14px;
-            border-radius: 30px;
-            border: 1px solid #f7c94840;
-            color: #f7c948;
-            font-weight: 700;
-            font-size: 15px;
-        }
-        canvas {
-            display: block;
-            width: 100%;
-            height: auto;
-            background: #0a0a18;
-            border-radius: 28px;
-            border: 1px solid #2a2a50;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
-            touch-action: none;
-            cursor: crosshair;
-        }
-        .panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin: 14px 0 10px 0;
+        .card p {
+            font-size: 18px;
+            color: #b0b8d0;
+            margin: 12px 0;
+            line-height: 1.6;
         }
         .btn {
-            padding: 14px 0;
-            border: none;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 16px;
-            color: #fff;
-            background: #2a2a50;
-            box-shadow: 0 6px 0 #15152a;
-            transition: all 0.07s ease;
-            touch-action: manipulation;
-            letter-spacing: 0.4px;
-            border: 1px solid #3a3a66;
-            text-align: center;
-        }
-        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #15152a; }
-        .btn-primary { background: #e94560; box-shadow: 0 6px 0 #a12a44; border-color: #ff6b85; }
-        .btn-success { background: #1b7a4a; box-shadow: 0 6px 0 #0f4a2e; border-color: #2ecc71; }
-        .btn-gold { background: #b8860b; box-shadow: 0 6px 0 #7a5a0a; border-color: #f7c948; }
-        .btn-gold:active { box-shadow: 0 2px 0 #7a5a0a; }
-        .shop-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .shop-item {
-            background: #1a1a34;
-            border-radius: 20px;
-            padding: 10px 6px;
-            text-align: center;
-            border: 1px solid #2f2f52;
-            color: #b0b8d0;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .shop-item .price {
-            color: #f7c948;
-            font-size: 14px;
-        }
-        .shop-item button {
-            margin-top: 6px;
-            padding: 6px 16px;
-            border: none;
-            border-radius: 30px;
-            background: #2a2a50;
-            color: #fff;
-            font-weight: 700;
-            font-size: 13px;
-            touch-action: manipulation;
-        }
-        .shop-item button:active { opacity: 0.6; }
-        .status {
-            color: #8892b0;
-            font-size: 13px;
-            text-align: center;
-            padding: 10px;
-            background: #0f0f24;
-            border-radius: 40px;
-            border: 1px solid #1f1f3a;
-            margin-top: 6px;
-            font-weight: 500;
-            letter-spacing: 0.2px;
-        }
-        .badge {
+            display: inline-block;
             background: #e94560;
             color: #fff;
-            border-radius: 40px;
-            padding: 2px 12px;
-            font-size: 11px;
+            font-size: 20px;
             font-weight: 700;
+            padding: 16px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-top: 20px;
+            border: 1px solid #ff6b85;
+            transition: 0.2s;
+            box-shadow: 0 6px 0 #a12a44;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #a12a44;
+        }
+        .btn:hover {
+            background: #ff6b85;
+        }
+        .divider {
+            border-top: 1px solid #2a2a4a;
+            margin: 28px 0 20px 0;
+        }
+        .note {
+            font-size: 15px;
+            color: #8892b0;
+        }
+        .note a {
+            color: #f7c948;
+            text-decoration: none;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-<div class="app">
+    <div class="card">
+        <h1>🚀 Bogdan</h1>
 
-    <div class="hud">
-        <div class="hud-left">
-            <span>❤️</span>
-            <div class="hp-bar-bg"><div class="hp-bar-fill" id="hpFill" style="width:100%"></div></div>
-            <span id="hpText">100</span>
-        </div>
-        <div class="hud-right">
-            <span class="coin-block">🪙 <span id="coinText">0</span></span>
-            <span class="badge" id="dmgBadge">⚔️ 2</span>
-        </div>
-    </div>
+        <p>
+            Если хочешь, чтобы я <strong>создал для тебя сайт</strong> или <strong>научил делать их сам</strong> — просто нажми на кнопку ниже.
+        </p>
 
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <a class="btn" href="https://max.ru/u/f9LHodD0cOJkY4TKqcjZbmoaMPNbL_3rrikgTN9LH0MpwOm1EfTMP5m5DQY" target="_blank">
+            💬 Написать в MAX
+        </a>
 
-    <div class="panel">
-        <button class="btn btn-primary" id="fireBtn">🔫 Огонь</button>
-        <button class="btn btn-success" id="autoBtn">🤖 Авто</button>
-        <button class="btn" id="resetBtn">🔄 Заново</button>
-    </div>
+        <div class="divider"></div>
 
-    <div class="shop-row">
-        <div class="shop-item">
-            <div>💪 Урон <span class="price">+2</span></div>
-            <div style="font-size:11px;color:#8892b0;">стоит <span class="price" id="upgradeCost1">20</span> 🪙</div>
-            <button id="buyDmg">Купить</button>
-        </div>
-        <div class="shop-item">
-            <div>❤️ Здоровье <span class="price">+20</span></div>
-            <div style="font-size:11px;color:#8892b0;">стоит <span class="price" id="upgradeCost2">30</span> 🪙</div>
-            <button id="buyHp">Купить</button>
-        </div>
-        <div class="shop-item" style="grid-column: span 2;">
-            <div>⚡ Авто-атака <span class="price">(вкл/выкл)</span></div>
-            <button id="toggleAuto" style="background:#2a2a50;padding:6px 20px;">Включить</button>
+        <div class="note">
+            Кнопка ведёт прямо в мой <a href="https://max.ru/u/f9LHodD0cOJkY4TKqcjZbmoaMPNbL_3rrikgTN9LH0MpwOm1EfTMP5m5DQY" target="_blank">MAX</a>.
+            <br>Без лишних шагов — просто нажал и написал.
         </div>
     </div>
-
-    <div class="status" id="statusMsg">👊 Нажми «Огонь» или включи авто-атаку</div>
-</div>
-
-<script>
-(function(){
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const hpFill = document.getElementById('hpFill');
-    const hpText = document.getElementById('hpText');
-    const coinText = document.getElementById('coinText');
-    const dmgBadge = document.getElementById('dmgBadge');
-    const statusMsg = document.getElementById('statusMsg');
-    const upgradeCost1 = document.getElementById('upgradeCost1');
-    const upgradeCost2 = document.getElementById('upgradeCost2');
-
-    const W = 400, H = 400;
-
-    // ----- ИГРОК -----
-    let player = {
-        x: 200, y: 350,
-        hp: 100, maxHp: 100,
-        damage: 2,
-        coins: 0
-    };
-
-    // ----- МАНЕКЕНЫ (5 ШТУК, ЖЕСТКО) -----
-    let dummies = [];
-    const DUMMY_RADIUS = 30;
-
-    // ----- ЦЕНЫ НА АПГРЕЙДЫ -----
-    let costDmg = 20;
-    let costHp = 30;
-
-    let autoMode = false;
-    let autoInterval = null;
-    let gameOver = false;
-
-    // ----- ИНИЦИАЛИЗАЦИЯ -----
-    function resetGame() {
-        player.hp = player.maxHp;
-        player.coins = 0;
-        dummies = [
-            { x: 70, y: 130, hp: 100, maxHp: 100 },
-            { x: 160, y: 90, hp: 100, maxHp: 100 },
-            { x: 250, y: 130, hp: 100, maxHp: 100 },
-            { x: 340, y: 110, hp: 100, maxHp: 100 },
-            { x: 200, y: 170, hp: 100, maxHp: 100 }
-        ];
-        gameOver = false;
-        updateHUD();
-        statusMsg.innerText = '💪 Новый раунд! Уничтожь всех манекенов!';
-        if (autoMode) {
-            startAuto();
-        }
-        draw();
-    }
-
-    function updateHUD() {
-        const hp = Math.max(0, player.hp);
-        hpText.innerText = Math.floor(hp);
-        const pct = (hp / player.maxHp) * 100;
-        hpFill.style.width = Math.max(0, pct) + '%';
-        coinText.innerText = player.coins;
-        dmgBadge.innerText = '⚔️ ' + player.damage;
-        upgradeCost1.innerText = costDmg;
-        upgradeCost2.innerText = costHp;
-        if (pct < 25) document.querySelector('.hp-bar-fill').style.background = '#ff3b3b';
-        else document.querySelector('.hp-bar-fill').style.background = 'linear-gradient(90deg, #e94560, #ff6b6b)';
-    }
-
-    // ----- АТАКА -----
-    function attack() {
-        if (gameOver) return;
-        let hit = false;
-        for (let d of dummies) {
-            if (d.hp <= 0) continue;
-            const dx = d.x - player.x;
-            const dy = d.y - player.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if (dist < 70) {
-                d.hp -= player.damage;
-                hit = true;
-                if (d.hp <= 0) {
-                    d.hp = 0;
-                    player.coins += 10;
-                    statusMsg.innerText = '🪙 +10 монет за убийство!';
-                    updateHUD();
-                }
-            }
-        }
-        if (!hit) {
-            statusMsg.innerText = '😤 Мимо! Подойди ближе к манекену.';
-        }
-        checkWinLose();
-        updateHUD();
-        draw();
-    }
-
-    // ----- АВТО-АТАКА -----
-    function startAuto() {
-        if (autoInterval) clearInterval(autoInterval);
-        autoInterval = setInterval(() => {
-            if (autoMode && !gameOver) {
-                attack();
-            }
-        }, 400);
-    }
-
-    function toggleAuto() {
-        autoMode = !autoMode;
-        if (autoMode) {
-            startAuto();
-            statusMsg.innerText = '🤖 Авто-атака ВКЛЮЧЕНА';
-            document.getElementById('toggleAuto').innerText = 'Выключить';
-        } else {
-            if (autoInterval) clearInterval(autoInterval);
-            autoInterval = null;
-            statusMsg.innerText = '🤖 Авто-атака ОТКЛЮЧЕНА';
-            document.getElementById('toggleAuto').innerText = 'Включить';
-        }
-    }
-
-    // ----- ПРОВЕРКА ПОБЕДЫ -----
-    function checkWinLose() {
-        const alive = dummies.filter(d => d.hp > 0).length;
-        if (player.hp <= 0) {
-            gameOver = true;
-            statusMsg.innerText = '💀 ПОРАЖЕНИЕ! Нажми «Заново»';
-            if (autoInterval) clearInterval(autoInterval);
-            draw();
-            return;
-        }
-        if (alive === 0) {
-            gameOver = true;
-            statusMsg.innerText = '🏆 ПОБЕДА! Ты уничтожил всех! +50 монет!';
-            player.coins += 50;
-            updateHUD();
-            if (autoInterval) clearInterval(autoInterval);
-            draw();
-            return;
-        }
-    }
-
-    // ----- РИСОВАНИЕ -----
-    function draw() {
-        ctx.clearRect(0, 0, W, H);
-
-        // Сетка (стиль)
-        ctx.strokeStyle = '#1a1a30';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < W; i += 40) {
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i, H);
-            ctx.stroke();
-        }
-        for (let i = 0; i < H; i += 40) {
-            ctx.beginPath();
-            ctx.moveTo(0, i);
-            ctx.lineTo(W, i);
-            ctx.stroke();
-        }
-
-        // Игрок
-        ctx.shadowColor = '#4fc3f7';
-        ctx.shadowBlur = 30;
-        ctx.fillStyle = '#4fc3f7';
-        ctx.beginPath();
-        ctx.arc(player.x, player.y, 22, 0, Math.PI*2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#fff';
-        ctx.font = '30px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🔫', player.x + 2, player.y - 2);
-
-        // Манекены
-        for (let d of dummies) {
-            if (d.hp <= 0) continue;
-            const r = DUMMY_RADIUS;
-            ctx.shadowColor = '#ffaa44';
-            ctx.shadowBlur = 20;
-            const grad = ctx.createRadialGradient(d.x-6, d.y-6, 4, d.x, d.y, r);
-            grad.addColorStop(0, '#b0b8d0');
-            grad.addColorStop(1, '#3a3a5a');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(d.x, d.y, r, 0, Math.PI*2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            ctx.fillStyle = '#222';
-            ctx.font = '28px Arial';
-            ctx.fillText('👤', d.x, d.y + 2);
-
-            // Полоска ХП
-            const bw = 50, bh = 6;
-            const bx = d.x - bw/2;
-            const by = d.y - r - 16;
-            ctx.fillStyle = '#2a2a48';
-            ctx.fillRect(bx-1, by-1, bw+2, bh+2);
-            const pct = Math.max(0, d.hp / d.maxHp);
-            ctx.fillStyle = pct > 0.5 ? '#2ecc71' : '#e74c3c';
-            ctx.fillRect(bx, by, bw * pct, bh);
-            ctx.fillStyle = '#ccd';
-            ctx.font = '8px monospace';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(Math.ceil(d.hp), d.x, by - 2);
-        }
-
-        if (gameOver) {
-            ctx.fillStyle = 'rgba(0,0,0,0.55)';
-            ctx.fillRect(0, 0, W, H);
-            ctx.fillStyle = player.hp <= 0 ? '#e74c3c' : '#2ecc71';
-            ctx.font = 'bold 40px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(player.hp <= 0 ? '💀 LOSE' : '🏆 WIN', W/2, H/2 - 10);
-            ctx.fillStyle = '#fff';
-            ctx.font = '18px Arial';
-            ctx.fillText('Нажми «Заново»', W/2, H/2 + 50);
-        }
-    }
-
-    // ----- ПОКУПКИ -----
-    function buyDamage() {
-        if (player.coins >= costDmg) {
-            player.coins -= costDmg;
-            player.damage += 2;
-            costDmg = Math.floor(costDmg * 1.5) + 5;
-            updateHUD();
-            statusMsg.innerText = '⚔️ Урон увеличен до ' + player.damage;
-            draw();
-        } else {
-            statusMsg.innerText = '❌ Не хватает монет!';
-        }
-    }
-
-    function buyHp() {
-        if (player.coins >= costHp) {
-            player.coins -= costHp;
-            player.maxHp += 20;
-            player.hp = player.maxHp;
-            costHp = Math.floor(costHp * 1.5) + 10;
-            updateHUD();
-            statusMsg.innerText = '❤️ Здоровье увеличено до ' + player.maxHp;
-            draw();
-        } else {
-            statusMsg.innerText = '❌ Не хватает монет!';
-        }
-    }
-
-    // ----- КНОПКИ -----
-    document.getElementById('fireBtn').addEventListener('click', attack);
-    document.getElementById('autoBtn').addEventListener('click', toggleAuto);
-    document.getElementById('resetBtn').addEventListener('click', function() {
-        if (autoInterval) clearInterval(autoInterval);
-        autoMode = false;
-        document.getElementById('toggleAuto').innerText = 'Включить';
-        resetGame();
-    });
-    document.getElementById('buyDmg').addEventListener('click', buyDamage);
-    document.getElementById('buyHp').addEventListener('click', buyHp);
-    document.getElementById('toggleAuto').addEventListener('click', toggleAuto);
-
-    // ----- ЗАПУСК -----
-    resetGame();
-})();
-</script>
 </body>
-  </html>ndex
+</html>
